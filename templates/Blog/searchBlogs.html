@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<!--
+	Future Imperfect by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>搜索列表</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+    <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="/static/assets/css/main.css"/>
+    <!--[if lte IE 9]><link rel="stylesheet" href="/static/assets/css/ie9.css" /><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
+    <style>
+            .post {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="{{ url_for('blog.index') }}">首页</a></h1>
+        <nav class="links">
+            <ul>
+                <li><a href="{{ url_for('blog.index') }}">博客</a></li>
+                {% if if_login %}
+                    <li><a href="{{ url_for('user.logout') }}">登出</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.login') }}">登录</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('blog.donate') }}">投食</a></li>
+            </ul>
+        </nav>
+        <nav class="main">
+            <ul>
+                <li class="menu">
+                    <a class="fa-bars" href="#menu">Menu</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Menu -->
+    <section id="menu">
+        <!-- Search -->
+        <section>
+            <form method="post" action="{{ url_for('blog.search') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="text" name="search" placeholder="回车搜索"/>
+            </form>
+        </section>
+
+        <!-- Actions -->
+        <section>
+            <ul class="actions vertical">
+                <li><a href="{{ url_for('blog.index') }}" class="button big fit">首页</a></li>
+                {% if not if_login %}
+                    <li><a href="{{ url_for('user.login') }}" class="button big fit">登录</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.logout') }}" class="button big fit">登出</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('blog.donate') }}" class="button big fit">投食</a></li>
+            </ul>
+        </section>
+
+    </section>
+
+    <!-- Main -->
+    <div id="main">
+        <h2>搜索结果,共{{ blogs|length }}条(第{{ this_page }}页,共{{ max_page }}页):</h2>
+        {% if blogs %}
+            {% for blog in blogs %}
+                <!-- Post -->
+                <article class="post">
+                    <header>
+                        <div class="title">
+                            <h2><a href="{{ url_for('blog.get_blog', blog_id=blog.id) }}">{{ blog.title }}</a></h2>
+                        </div>
+                        <div class="meta">
+                            <time class="published"
+                                  datetime="{{ blog.add_datetime|string }}">{{ blog.add_datetime|string|intercept(0, 10) }}</time>
+                            <a href="{{ url_for('blog.about') }}" class="author"><span class="name">{{ blog.sender }}</span><img
+                                    src="https://avatars0.githubusercontent.com/u/{{ blog.get_sender().user_id }}?v=4"></a>
+                        </div>
+                    </header>
+                    <footer>
+                        <ul class="actions">
+                            <li><a href="{{ url_for('blog.get_blog', blog_id=blog.id) }}" class="button big">Read</a></li>
+                        </ul>
+                        <ul class="stats">
+                            <li><span class="icon fa-eye"></span>{{ blog.read }}</li>
+                            <li><span class="icon fa-comment">{{ blog.get_com_len() }}</span></li>
+                        </ul>
+                    </footer>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="post">
+                <h2>无任何内容</h2>
+            </div>
+        {% endif %}
+        <!-- Post -->
+
+        <!-- Pagination -->
+        <ul class="actions pagination">
+            {% if this_page > min_page %}
+                <li><a href="{{ url_for('blog.blogs_search', content=search, page_num=this_page - 1) }}" class="button big">上一页</a></li>
+            {% else %}
+                <li><a class="disabled button big">上一页</a></li>
+            {% endif %}
+            {% if this_page < max_page %}
+                <li><a href="{{ url_for('blog.blogs_search', content=search, page_num=this_page + 1) }}" class="button big">下一页</a></li>
+            {% else %}
+                <li><a class="disabled button big">下一页</a></li>
+            {% endif %}
+        </ul>
+
+    </div>
+
+    <!-- Sidebar -->
+    <section id="sidebar">
+
+        <!-- Intro -->
+        <section id="intro">
+            <header>
+                <h2>博客</h2>
+                <p>Simple is better than complex.</p>
+            </header>
+        </section>
+
+        <!-- Mini Posts -->
+        <section>
+            <div class="mini-posts">
+                <h2>友情链接</h2>
+                <!-- Mini Post -->
+                <article class="mini-post">
+                    <header>
+                        <h2><a href="https://www.baidu.com/">百度搜索引擎</a></h2>
+                    </header>
+                </article>
+
+                <article class="mini-post">
+                    <header>
+                        <h2><a href="https://game.wali.com/">小米游戏中心</a></h2>
+                    </header>
+                </article>
+
+            </div>
+        </section>
+
+
+        <!-- Footer -->
+    <section id="footer">
+        <p class="copyright">©2018 <a href="{{ url_for('blog.index') }}">XuRi's Blog</a> | Template by <a href="http://html5up.net">HTML5 UP</a>.</p>
+    </section>
+
+    </section>
+
+</div>
+
+<!-- Scripts -->
+<script src="/static/assets/js/jquery.min.js"></script>
+<script src="/static/assets/js/skel.min.js"></script>
+<script src="/static/assets/js/util.js"></script>
+<!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
+<script src="/static/assets/js/main.js"></script>
+
+</body>
+</html>

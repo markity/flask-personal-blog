@@ -1,0 +1,37 @@
+# ubuntu 18.04
+
+su
+
+sudo apt-get install python3-pip
+
+git clone https://git.coding.net/Drxuri/Flask-Personal-Blog.git
+
+cd Flask-Personal-Blog
+
+pip3 install -r requirements.txt
+
+vim run.py # 把if __main__ == '__name__'去掉,将里面的代码向前缩进四格,去掉app.run这一行,第一级代码块只有init()这一行
+
+sudo apt-get install nginx
+
+sudo vim /etc/nginx/sites-available/default
+
+server {
+		listen 80;
+		server_name example.org; # 外部域名
+
+		location / {
+			proxy_pass http://127.0.0.1:8000;
+			proxy_set_header Host $host;
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+}
+
+sudo service nginx restart
+
+pip3 install gunicorn
+
+gunicorn run:app
+
+# 备份所有数据库命令
+mysqldump -uroot -p --all-databases > all_databases.sql

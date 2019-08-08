@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<!--
+	Future Imperfect by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>博客</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+    <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="/static/assets/css/main.css"/>
+    <!--[if lte IE 9]><link rel="stylesheet" href="/static/assets/css/ie9.css" /><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
+    <style type="text/css">
+        .post {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="single">
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="{{ url_for('blog.index') }}">首页</a></h1>
+        <nav class="links">
+            <ul>
+                <li><a href="{{ url_for('blog.index') }}">博客</a></li>
+                {% if if_login %}
+                    <li><a href="{{ url_for('user.logout') }}">登出</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.login') }}">登录</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('blog.donate') }}">投食</a></li>
+            </ul>
+        </nav>
+        <nav class="main">
+            <ul>
+                <li class="menu">
+                    <a class="fa-bars" href="#menu">Menu</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Menu -->
+    <section id="menu">
+        <!-- Search -->
+        <section>
+            <form method="post" action="{{ url_for('blog.search') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="text" name="search" placeholder="回车搜索"/>
+            </form>
+        </section>
+
+        <!-- Actions -->
+        <section>
+            <ul class="actions vertical">
+                <li><a href="{{ url_for('blog.index') }}" class="button big fit">首页</a></li>
+                {% if not if_login %}
+                    <li><a href="{{ url_for('user.login') }}" class="button big fit">登录</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.logout') }}" class="button big fit">登出</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('blog.donate') }}" class="button big fit">投食</a></li>
+            </ul>
+        </section>
+
+    </section>
+
+    <!-- Main -->
+    <div id="main">
+        <!-- Post -->
+        <article class="post">
+            <header>
+                <div class="title">
+                    <h2>{{ blog.title }}</h2>
+                </div>
+                <div class="meta">
+                    <time class="published" datetime="{{ blog.add_datetime|string }}">
+                        添加:{{ blog.add_datetime|string|intercept(0, 10) }}</time>
+                    <time class="published" datetime="{{ blog.edit_datetime|string }}">
+                        编辑:{{ blog.edit_datetime|string|intercept(0, 10) }}</time>
+                    <a href="{{ url_for('blog.about') }}" class="author"><span class="name">{{ blog.sender }}</span><img
+                            src="https://avatars0.githubusercontent.com/u/{{ blog.get_sender().user_id }}?v=4"></a>
+                </div>
+            </header>
+            {{ m_content|safe }}
+            <footer>
+                <ul class="stats">
+                    <li><span class="icon fa-eye"></span>{{ blog.read }}</li>
+                    <li><span href="#" class="icon fa-comment">{{ blog.get_com_len() }}</span></li>
+                </ul>
+            </footer>
+        </article>
+
+    </div>
+
+    <!-- Comment -->
+    <section class="post">
+        <h3>留言:</h3>
+        <form method="post" action="{{ url_for('blog.get_blog', blog_id=blog.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="row uniform">
+                {% if if_login %}
+                    <div class="12u$">
+                            <textarea style="resize: none" name="content" id="demo-message"
+                                      placeholder="Enter your message"
+                                      rows="6"></textarea>
+                    </div>
+                    <div class="12u$">
+                        <ul class="actions">
+                            <li><input type="submit" value="Send Message"/></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <p><a href="{{ url_for('user.login') }}">登录</a>之后可以留言</p>
+                {% endif %}
+            </div>
+        </form>
+        <hr>
+        {% for comment in comments %}
+            <div class="comment">
+                {% for line in comment.content|split('\r\n') %}
+                    {{ line }}
+                    <br>
+                {% endfor %}
+                <div class="author" href="www.xuriblog.xyz">
+                    {{ comment.get_sender().username }} {{ comment.add_datetime|string|intercept(0, 10) }}
+                    <img src="https://avatars0.githubusercontent.com/u/{{ comment.get_sender().user_id }}?v=4">
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+    </section>
+
+    <!-- Footer -->
+    <section id="footer">
+        <p class="copyright">©2018 <a href="{{ url_for('blog.index') }}">XuRi's Blog</a> | Template by <a href="http://html5up.net">HTML5 UP</a>.
+        </p>
+    </section>
+
+</div>
+<!-- Scripts -->
+<script src="/static/assets/js/jquery.min.js"></script>
+<script src="/static/assets/js/skel.min.js"></script>
+<script src="/static/assets/js/util.js"></script>
+<!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
+<script src="/static/assets/js/main.js"></script>
+
+</body>
+</html>
